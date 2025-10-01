@@ -1,4 +1,5 @@
 import express from 'express';
+import axios from 'axios'
 import cors from 'cors';
 // credentails
 import dotenv from 'dotenv';
@@ -7,6 +8,8 @@ import { query } from './db.js';
 // authentication
 import session from 'express-session';
 import passport from 'passport';
+// form data
+import bodyParser from 'body-parser'; 
 
 // extracting all the .env varibles
 dotenv.config();
@@ -19,23 +22,29 @@ app.use(cors());
 // Parse JSON bodies
 app.use(express.json());
 
+// url-encoded-data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
 
+const API_KEY_DESTINATION_IMAGES_ACCESS_KEY = process.env.DESTINATION_PHOTO_BY_ACCESS_KEY_API
+const API_KEY_DESTINATION_IMAGES_SECRET_KEY = process.env.DESTINATION_PHOTO_BY_SECRET_KEY_API
 
 // Basic health check route to test server & DB connection
-app.get('/health', async (req, res) => {
-  try {
-    // Run a simple query on PostgreSQL to check connectivity
-    const dbResponse = await query('SELECT NOW()');
-    res.status(200).json({
-      status: 'OK',
-      serverTime: new Date().toISOString(),
-      dbTime: dbResponse.rows[0].now,
-    });
-  } catch (error) {
-    console.error('Health check failed:', error);
-    res.status(500).json({ status: 'Error connecting to database' });
-  }
-});
+app.post('/NewTrip',async (req,res)=>{
+  
+  console.log("Data came from the frontend form was : ", req.body);
+  
+  res.json({ message: "Form received successfully", data: req.body });
+
+  // API - to get the destination images
+  const destination_image_api_url = await axios.get(`https://api.unsplash.com/search/photos?query=${req.body.Traveller_Destination}&client_id=${API_KEY_DESTINATION_IMAGES_ACCESS_KEY}&client_secret=${API_KEY_DESTINATION_IMAGES_SECRET_KEY}`);
+  const response = destination_image_api_url.data
+  console.log(response);
+  console.log(req.body.Traveller_Destination);
+  
+
+})
+
 
 const PORT = process.env.PORT || 5000;
 

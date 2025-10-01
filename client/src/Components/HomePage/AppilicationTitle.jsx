@@ -1,6 +1,7 @@
 import React from 'react'
 
 function AppilicationTitle() {
+
   return (
     <div className=' flex my-5 mx-5 justify-between '>
         <div>
