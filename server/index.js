@@ -1,10 +1,16 @@
 import express from 'express';
 import cors from 'cors';
+// credentails
 import dotenv from 'dotenv';
+// database
 import { query } from './db.js';
+// authentication
+import session from 'express-session';
+import passport from 'passport';
 
+// extracting all the .env varibles
 dotenv.config();
-
+// instance of an express app
 const app = express();
 
 // Enable CORS for all origins (adjust for production!)
@@ -12,6 +18,8 @@ app.use(cors());
 
 // Parse JSON bodies
 app.use(express.json());
+
+
 
 // Basic health check route to test server & DB connection
 app.get('/health', async (req, res) => {
