@@ -28,8 +28,8 @@ function DashBoard() {
     <div>
         <AppilicationTitle  />
       <div className='flex m-5 gap-4'>
-          {arrayOfSummaryCard.map((obj)=>{
-          return <SummaryCard arrayOfSummaryCard={obj} />
+          {arrayOfSummaryCard.map((obj,index)=>{
+          return <SummaryCard arrayOfSummaryCard={obj} key={index} />
         })}
       </div>
       <div className='flex mt-10 ml-6 gap-4'>

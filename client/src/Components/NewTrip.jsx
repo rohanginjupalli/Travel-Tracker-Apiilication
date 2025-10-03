@@ -1,6 +1,7 @@
 import React from 'react'
 import {useForm} from 'react-hook-form'
 import axios from 'axios'
+import DestinationCard from './HomePage/DestinationCard';
 
 function NewTrip() {
 
@@ -9,7 +10,7 @@ function NewTrip() {
     const onSubmit = async (data)=>{
       try{
         const res = await axios.post('http://localhost:5000/NewTrip',data);
-        alert("Trip updated successfully!");
+        console.log(res.data);
       }catch(err){
         console.error("Error submitting form:", err)
         alert("Something went wrong")
@@ -76,7 +77,7 @@ function NewTrip() {
                          dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" 
               placeholder=" " 
               required 
-              {...register('Trip-Type')}
+              {...register('tripType')}
             />
             <label 
               htmlFor="Trip-Type" 
