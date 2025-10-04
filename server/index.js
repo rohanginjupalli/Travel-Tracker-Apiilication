@@ -108,9 +108,11 @@ app.post('/NewTrip', async (req, res) => {
       temp_celsius: currentWeather,
       details: weatherRes.data.weather
     },
-    hotels: {
-      hotels : hotelsRes.data
-    }
+    // hotels: {
+    //   hotels : hotelsRes.data
+    // },
+    Destination : destination,
+    About_Destination : req.body.title
   });
 });
 

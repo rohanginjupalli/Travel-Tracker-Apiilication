@@ -1,16 +1,40 @@
-import React from 'react'
+import { useContext } from 'react'
+import { TripContext } from './Context/TripContext';
 import {useForm} from 'react-hook-form'
 import axios from 'axios'
 import DestinationCard from './HomePage/DestinationCard';
 
+
 function NewTrip() {
 
-    const {register,handleSubmit} = useForm();
+    const {
+      weather,
+      setWeather,
+      hotels,
+      setHotels,
+      image,
+      setImages,
+      descDestination,
+      setdescDestination,
+      destination,
+      setDestination  
+    } = useContext(TripContext);
 
+    const {register,handleSubmit} = useForm();
     const onSubmit = async (data)=>{
       try{
         const res = await axios.post('http://localhost:5000/NewTrip',data);
         console.log(res.data);
+        setWeather({
+          location: data.Traveller_Destination,
+          current_weather: res.data.weather.temp_celsius
+        });
+        setdescDestination((prevValue)=>{
+          return res.data.About_Destination
+        })
+        setDestination(()=>{
+          return res.data.Destination;
+        })
       }catch(err){
         console.error("Error submitting form:", err)
         alert("Something went wrong")
