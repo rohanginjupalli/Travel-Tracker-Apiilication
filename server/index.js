@@ -3,16 +3,12 @@ import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import { query } from './db.js';
-import session from 'express-session';
-import passport from 'passport';
-
 dotenv.config();
 const app = express();
 
 app.use(cors());
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const API_KEY_DESTINATION_IMAGES_ACCESS_KEY = process.env.DESTINATION_PHOTO_BY_ACCESS_KEY_API;
@@ -55,7 +51,7 @@ app.post('/NewTrip', async (req, res) => {
     return res.status(500).json({ error: "Failed to fetch weather data" });
   }
 
-  // --- SerpApi Google Hotels ---
+  // --- SerpApi Google Hotels .... api _ secret_key ---
   let hotelsRes;
   try {
     const serpUrl = `https://serpapi.com/search.json?engine=google_hotels&q=${destination}&check_in_date=${checkin_date}&check_out_date=${checkout_date}&adults=${numAdults}&currency=USD&gl=in&api_key=${SERP_API_KEY}`;
@@ -82,6 +78,8 @@ app.post('/NewTrip', async (req, res) => {
     About_Destination: req.body.title
   });
 });
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
