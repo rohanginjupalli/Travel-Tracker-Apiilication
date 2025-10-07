@@ -1,8 +1,9 @@
 import { useContext } from 'react'
 import { TripContext } from './Context/TripContext';
-import {useForm} from 'react-hook-form'
+import {set, useForm} from 'react-hook-form'
 import axios from 'axios'
 import DestinationCard from './HomePage/DestinationCard';
+import Hotels from './HotelsAvailable/Hotels';
 
 
 function NewTrip() {
@@ -34,6 +35,12 @@ function NewTrip() {
         })
         setDestination(()=>{
           return res.data.Destination;
+        })
+        setHotels(()=>{
+          return res.data.hotels;
+        })
+        setImages(()=>{
+          return res.data.images
         })
       }catch(err){
         console.error("Error submitting form:", err)

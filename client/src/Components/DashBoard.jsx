@@ -34,8 +34,6 @@ function DashBoard() {
       </div>
       <div className='flex mt-10 ml-6 gap-4'>
         <DestinationCard />
-        <DestinationCard />
-        <DestinationCard />
       </div>
     </div>
   )
