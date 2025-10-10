@@ -32,24 +32,6 @@ function NewTrip() {
       alert("Something went wrong");
     }
 
-    // database logic
-
-    try{
-      const res = await axios.post('http://localhost:5001/user/NewTrip',{
-        userName: "Rohan Ginjupalli", 
-        title: data.title,
-        tripType: data.tripType,
-        Traveller_Destination: data.Traveller_Destination,
-        adults: data.adults,
-        budget: data.budget,
-        checkin_date: data.checkin_date,
-        checkout_date: data.checkout_date
-      })
-
-    }catch(error){
-      console.log("unable to reach the route http://localhost:5000/user/NewTrip ",error);
-      alert("Unable to load the data in the database");
-    }
 
   };
 
@@ -62,6 +44,14 @@ function NewTrip() {
           
           {/* Destination Info */}
           <div className="space-y-4">
+
+            <label className="block text-gray-700 font-medium">Username</label>
+            <input
+              type="text"
+              placeholder="Enter your username"
+              {...register('userName', { required: true })}
+              className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />  
             <label className="block text-gray-700 font-medium">Destination Title</label>
             <input
               type="text"

@@ -35,6 +35,8 @@ app.post("/user/NewTrip", async (req, res) => {
       checkout_date
       } = req.body;
 
+      // enter the user into the database
+
     const userRes = await db.query(
       "INSERT INTO users_info(name) VALUES ($1) RETURNING *",
       [userName]
@@ -42,19 +44,34 @@ app.post("/user/NewTrip", async (req, res) => {
 
     const userId = userRes.rows[0].id;
 
+    // entering the form data into the database
+
     const tripRes = await db.query(
       `INSERT INTO trip_form_info 
        (user_id, description, destination, start_date, end_date, budget, num_adults)
        VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
       [userId, tripType, Traveller_Destination, checkin_date, checkout_date, budget, adults]
     );
-    res.json({ message: "Trip saved successfully", tripId: tripRes.rows[0].id });
+    const tripId = tripRes.rows[0].id;
+    res.json({message:"Sucessfully user info have be saved in the database",tripId})
    }catch (error) {
     console.error(error);
     res.status(500).json({ error: "Database error" });
   }
+});
 
-
+app.post("/user/NewTrip/apidata", async (req, res) => {
+  try {
+    const weatherResponse = await db.query(
+      `INSERT INTO weather_info (trip_id,temp_celsius)
+       VALUES ($1, $2) RETURNING id`,
+      [req.body.trip_id, req.body.temp_celsius]
+    );
+    res.json({ message: "Weather info saved", id: weatherResponse.rows[0].id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Database error inserting weather info" });
+  }
 });
 
 
