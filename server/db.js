@@ -61,17 +61,46 @@ app.post("/user/NewTrip", async (req, res) => {
 });
 
 app.post("/user/NewTrip/apidata", async (req, res) => {
+
+  // storing data into weather table 
   try {
     const weatherResponse = await db.query(
       `INSERT INTO weather_info (trip_id,temp_celsius)
        VALUES ($1, $2) RETURNING id`,
       [req.body.trip_id, req.body.temp_celsius]
     );
-    res.json({ message: "Weather info saved", id: weatherResponse.rows[0].id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Database error inserting weather info" });
   }
+
+  // storing data into the hotels table
+
+  try {
+  
+    const hotels = req.body.hotels
+
+    if (hotels && hotels.length > 0) {
+      for (const hotel of hotels) {
+        const name = hotel.name || "Unknown Hotel";
+        const price = hotel.rate_per_night?.extracted_lowest || 0;
+        const amenities = hotel.amenities || [];
+
+        await db.query(
+          `INSERT INTO hotels (trip_id, name, price, amenities)
+           VALUES ($1, $2, $3, $4)`,
+          [req.body.trip_id, name, price, amenities]
+        );
+      }
+      console.log(`Saved ${hotels.length} hotels for trip ${req.body.trip_id}`);
+    }
+
+  } catch (error) {
+    console.error("Database error inserting weather/hotels info:", error);
+    res.status(500).json({ error: "Database error inserting weather/hotels info" });
+  }
+
+  
 });
 
 
