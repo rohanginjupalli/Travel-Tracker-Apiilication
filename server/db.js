@@ -61,25 +61,31 @@ app.post("/user/NewTrip", async (req, res) => {
 });
 
 app.post("/user/NewTrip/apidata", async (req, res) => {
+  const errors = [];
+  let weatherInserted = false;
+  let savedHotels = 0;
 
-  // storing data into weather table 
+  // Insert weather only if provided (temp_celsius is non-null)
   try {
-    const weatherResponse = await db.query(
-      `INSERT INTO weather_info (trip_id,temp_celsius)
-       VALUES ($1, $2) RETURNING id`,
-      [req.body.trip_id, req.body.temp_celsius]
-    );
+    const { trip_id, temp_celsius } = req.body;
+    if (temp_celsius !== undefined && temp_celsius !== null) {
+      await db.query(
+        `INSERT INTO weather_info (trip_id,temp_celsius)
+         VALUES ($1, $2) RETURNING id`,
+        [trip_id, temp_celsius]
+      );
+      weatherInserted = true;
+    } else {
+      console.log(`Skipping weather insert for trip ${req.body.trip_id} because temp_celsius is null`);
+    }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Database error inserting weather info" });
+    console.error('Database error inserting weather info:', error);
+    errors.push({ weather: error.message || String(error) });
   }
 
-  // storing data into the hotels table
-
+  // Insert hotels if available
   try {
-  
-    const hotels = req.body.hotels
-
+    const hotels = req.body.hotels;
     if (hotels && hotels.length > 0) {
       for (const hotel of hotels) {
         const name = hotel.name || "Unknown Hotel";
@@ -92,15 +98,24 @@ app.post("/user/NewTrip/apidata", async (req, res) => {
           [req.body.trip_id, name, price, amenities]
         );
       }
-      console.log(`Saved ${hotels.length} hotels for trip ${req.body.trip_id}`);
+      savedHotels = hotels.length;
+      console.log(`Saved ${savedHotels} hotels for trip ${req.body.trip_id}`);
     }
-
   } catch (error) {
-    console.error("Database error inserting weather/hotels info:", error);
-    res.status(500).json({ error: "Database error inserting weather/hotels info" });
+    console.error('Database error inserting hotels info:', error);
+    errors.push({ hotels: error.message || String(error) });
   }
 
-  
+  // Return consolidated result (do not return 500 for partial failures; include error details)
+  const responsePayload = {
+    message: 'Apidata processed',
+    trip_id: req.body.trip_id,
+    weatherInserted,
+    savedHotels,
+  };
+  if (errors.length > 0) responsePayload.errors = errors;
+
+  return res.json(responsePayload);
 });
 
 

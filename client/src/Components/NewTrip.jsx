@@ -2,9 +2,6 @@ import { useContext } from 'react';
 import { TripContext } from './Context/TripContext';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import DestinationCard from './HomePage/DestinationCard';
-import Hotels from './HotelsAvailable/Hotels';
-
 
 function NewTrip() {
   const {
@@ -22,11 +19,18 @@ function NewTrip() {
     // to reach out the data to backend server
     try {
       const res = await axios.post('http://localhost:5000/NewTrip', data);
-      setWeather({ location: data.Traveller_Destination, current_weather: res.data.weather.temp_celsius });
-      setdescDestination(res.data.About_Destination);
-      setDestination(res.data.Destination);
-      setHotels(res.data.hotels);
-      setImages(res.data.images);
+      console.log('API response:', res.data);
+
+      // Match the weather shape used in context (temp_celsius)
+      setWeather({ location: data.Traveller_Destination, temp_celsius: res.data.weather?.temp_celsius ?? null });
+
+      setdescDestination(res.data.About_Destination || data.title || '');
+
+      // server returns Destination as encoded; decode for display
+      setDestination(res.data.Destination ? decodeURIComponent(res.data.Destination) : data.Traveller_Destination);
+
+      setHotels(Array.isArray(res.data.hotels) ? res.data.hotels : []);
+      setImages(Array.isArray(res.data.images) ? res.data.images : []);
     } catch (err) {
       console.error("Error submitting form:", err);
       alert("Something went wrong");

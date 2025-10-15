@@ -2,8 +2,11 @@ import React, { useState, createContext } from 'react';
 
 const TripContext = createContext();
 
+  
+
 function Provider({ children }) {
-  const [weather, setWeather] = useState({location :"",current_weather:""});
+  // use a consistent shape for weather that other components expect (temp_celsius)
+  const [weather, setWeather] = useState({ location: "", temp_celsius: null });
   const [hotels, setHotels] = useState([]);
   const [image,setImages] = useState([{}]);
   const [descDestination , setdescDestination] = useState('')

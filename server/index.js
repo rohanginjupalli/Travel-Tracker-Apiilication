@@ -37,17 +37,33 @@ app.post('/NewTrip', async (req, res) => {
     return res.status(500).json({ error: "Failed to fetch destination images" });
   }
 
-  //  Weather 
+  //  Weather (using Open-Meteo: free, no API key)
+  //  We first geocode the destination to get lat/lon, then request current weather
   let weatherRes;
   let currentWeather;
   try {
-    weatherRes = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?q=${destination}&appid=${API_KEY_DESTINATION_WEATHER}&units=metric`
-    );
-    currentWeather = weatherRes.data.main.temp;
+    // geocode the destination
+    const geocodeUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${destination}&count=1`;
+    const geoResp = await axios.get(geocodeUrl);
+    const geoData = geoResp.data;
+
+    if (!geoData || !geoData.results || geoData.results.length === 0) {
+      throw new Error('Geocoding returned no results');
+    }
+
+    const { latitude, longitude, name: resolvedName, country } = geoData.results[0];
+
+    // fetch current weather from Open-Meteo
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`;
+    weatherRes = await axios.get(weatherUrl);
+
+    // Open-Meteo returns current_weather.temperature in Celsius
+    currentWeather = weatherRes.data?.current_weather?.temperature ?? null;
+    console.log(`Resolved location: ${resolvedName}, ${country} (${latitude},${longitude}) - temp: ${currentWeather}`);
   } catch (e) {
     console.error("Weather API failed:", e.message);
-    return res.status(500).json({ error: "Failed to fetch weather data" });
+    // continue without blocking: set currentWeather to null but let other APIs proceed
+    currentWeather = 0;
   }
 
   // SerpApi Google Hotels
@@ -110,12 +126,12 @@ app.post('/NewTrip', async (req, res) => {
   res.json({
     message: "Form received successfully",
     data: req.body,
-    images: imageRes.data.results,
+    images: imageRes?.data?.results || [],
     weather: {
       temp_celsius: currentWeather,
-      details: weatherRes.data.weather
+      details: weatherRes?.data?.current_weather ? weatherRes.data.current_weather : null
     },
-    hotels: hotelsRes.data.properties || [],
+    hotels: hotelsRes?.data?.properties || [],
     Destination: destination,
     About_Destination: req.body.title
   });
