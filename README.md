@@ -40,7 +40,7 @@ Weather & details panel – check forecast for the selected destination.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### **Frontend**
-- **React.js** – Building dynamic, responsive user interfaces  , State management
+- **React.js** – Building dynamic, responsive user interfaces  , State management using Context API
 - **HTML5 & CSS3** – Structuring and styling components  
 - **JavaScript (ES6+)** – App logic and interactivity
 
@@ -51,7 +51,7 @@ Weather & details panel – check forecast for the selected destination.
 ### **Database**
 
 - **PqSql**
-- - **PqAdmin4**
+- **PqAdmin4**
 
 ### **APIs & Integrations**
 - **OpenWeather API** – Real-time weather data  
