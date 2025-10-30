@@ -14,7 +14,7 @@ function DestinationCard() {
       {/* Display first image */}
       <img
   className="w-full"
-  src={image?.[0]?.urls?.small || "https://via.placeholder.com/400"}
+  src={image?.[4]?.urls?.thumb || "https://via.placeholder.com/400"}
   alt={destination || "Destination"}
 />
 
